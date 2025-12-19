@@ -1,0 +1,15 @@
+body {
+    font-family: Arial;
+    padding: 20px;
+}
+
+textarea {
+    width: 60%;
+    height: 120px;
+}
+
+.card {
+    background: #f4f4f4;
+    padding: 15px;
+    margin: 10px;
+}

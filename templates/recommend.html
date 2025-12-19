@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recommendation</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h2>Find the Best Courses</h2>
+
+<textarea id="query" placeholder="Enter what you want to learn..."></textarea>
+
+<select id="model">
+    <option value="tfidf">TF-IDF Model</option>
+    <option value="neural">Neural Model</option>
+</select>
+
+<button onclick="getRecommendations()">Recommend</button>
+
+<div id="results"></div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>
