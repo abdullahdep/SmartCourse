@@ -1,9 +1,10 @@
 import numpy as np
 import joblib
 from sklearn.metrics.pairwise import cosine_similarity
+from scipy.sparse import load_npz
 
 vectorizer = joblib.load("models/tfidf_vectorizer.joblib")
-tfidf_matrix = np.load("models/tfidf_features.npz")['arr_0']
+tfidf_matrix = load_npz("models/tfidf_features.npz")
 
 def tfidf_recommend(query, df, top_k=10):
     query_vec = vectorizer.transform([query]).toarray()  # must use SAME vectorizer
@@ -13,7 +14,7 @@ def tfidf_recommend(query, df, top_k=10):
     results = []
     for i in top_idx:
         results.append({
-            "title": df.iloc[i]["Course Name"],
+            "title": df.iloc[i]["University"],
             "department": df.iloc[i]["Department"],
             "description": df.iloc[i]["Course Description"],
             "score": round(float(similarity[i] * 100), 2)
