@@ -1,25 +1,214 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Recommendation</title>
+    <title>SmartCourse – Get Recommendations</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .navbar {
+            background-color: #333;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .navbar-right {
+            display: flex;
+            gap: 15px;
+        }
+        .navbar a, .navbar button {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            background-color: #555;
+            transition: background-color 0.3s;
+        }
+        .navbar a:hover, .navbar button:hover {
+            background-color: #777;
+        }
+        .navbar .logout-btn {
+            background-color: #dc3545;
+        }
+        .navbar .logout-btn:hover {
+            background-color: #c82333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .search-box h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        #query {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            min-height: 100px;
+            resize: vertical;
+        }
+        #query:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.5);
+        }
+        #model {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        #model:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.5);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        #results {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .card p {
+            margin: 10px 0;
+            color: #555;
+            line-height: 1.5;
+        }
+        .card strong {
+            color: #333;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Find the Best Courses</h2>
+<div class="navbar">
+    <h1>SmartCourse</h1>
+    <div class="navbar-right">
+        <a href="/">Home</a>
+        <a href="/dashboard?token=current">Dashboard</a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
 
-<textarea id="query" class="form-control " placeholder="Enter what you want to learn..."></textarea>
+<div class="container">
+    <div class="search-box">
+        <h2>Find the Best Courses</h2>
+        <p>Enter what you want to learn and we'll recommend the best courses for you</p>
+        
+        <div class="form-group">
+            <label for="query">What do you want to learn?</label>
+            <textarea id="query" placeholder="E.g., Web development, Data science, Digital marketing..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="model">Select Speed:</label>
+            <select id="model">
+                <option value="tfidf">Fast Response</option>
+                <option value="neural">Accurate Response</option>
+            </select>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="checkAuthAndRecommend()">Get Recommendations</button>
+        </div>
+    </div>
 
-<select id="model">
-    <option value="tfidf">TF-IDF Model</option>
-    <option value="neural">Neural Model</option>
-</select>
-
-<button onclick="getRecommendations()">Recommend</button>
-
-<div id="results"></div>
+    <div id="results"></div>
+</div>
 
 <script src="/static/script.js"></script>
-
-</body>
-</html>
+<script>
+    // Extract token from URL on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        const token = getTokenFromURL();
+        if (token) {
+            localStorage.setItem("auth_token", token);
+        }
+    });
+    
+    function logout() {
+        fetch("/api/logout", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("user_id");
+            localStorage.removeItem("username");
+            window.location.href = "/";
+        });
+    }
+</script>

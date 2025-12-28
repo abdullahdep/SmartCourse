@@ -16,9 +16,15 @@ def neural_recommend(query, df):
     for score, idx in zip(top_k.values, top_k.indices):
         i = int(idx)
         results.append({
-            "title": df.iloc[i]["Course Name"],
+            "title": df.iloc[i]["University"],
             "department": df.iloc[i]["Department"],
+            "city": df.iloc[i]["City/Cities"],
             "description": df.iloc[i]["Course Description"],
+            "shifts": df.iloc[i]["shifts"],
+            "online": df.iloc[i]["online"],
+            "admission_dates": df.iloc[i]["Admission dates"],
+            "marks_required": df.iloc[i]["Marks required"],
+            "labs_available": df.iloc[i]["Labs Avalible"],
             "score": float(score * 100)
         })
 

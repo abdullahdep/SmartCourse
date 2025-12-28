@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartCourse – Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .navbar {
+            background-color: #333;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .navbar-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .admin-badge {
+            background-color: #ff6b6b;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .navbar button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .navbar button:hover {
+            background-color: #c82333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .page-title {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .page-title h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .page-title p {
+            color: #666;
+            margin: 0;
+        }
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .upload-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .upload-section p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-input-label {
+            display: block;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .file-input-label:hover {
+            background-color: #e8eaff;
+        }
+        .file-input-label.dragover {
+            background-color: #dfe1ff;
+            border-color: #5568d3;
+        }
+        .file-name {
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-upload {
+            flex: 1;
+            padding: 12px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-upload:hover {
+            background-color: #218838;
+        }
+        .btn-upload:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .btn-cancel {
+            flex: 1;
+            padding: 12px 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-cancel:hover {
+            background-color: #5a6268;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info-message {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .progress-section {
+            display: none;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #28a745;
+            width: 0%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            transition: width 0.3s;
+        }
+        .help-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .help-section h4 {
+            color: #333;
+            margin-top: 0;
+        }
+        .help-section ul {
+            color: #666;
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .help-section li {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h1>SmartCourse</h1>
+    <div class="navbar-right">
+        <span class="admin-badge">🔐 Admin: <span id="admin-name"></span></span>
+        <button onclick="adminLogout()">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-title">
+        <h2>Admin Dashboard</h2>
+        <p>Upload new course data and retrain recommendation models</p>
+    </div>
+
+    <div class="help-section">
+        <h4>📋 CSV File Requirements:</h4>
+        <ul>
+            <li>Must include columns: University, Department, City/Cities, Course Description, shifts, online, Admission dates, Marks required, Labs Avalible</li>
+            <li>File format: CSV (Comma-separated values)</li>
+            <li>Maximum file size: 50 MB</li>
+            <li>Uploading will automatically retrain both TF-IDF and Neural models</li>
+        </ul>
+    </div>
+
+    <div id="success-message" class="message success-message"></div>
+    <div id="error-message" class="message error-message"></div>
+    <div id="info-message" class="message info-message"></div>
+
+    <div class="upload-section">
+        <h3>Upload Course Data CSV</h3>
+        <p>Select a CSV file to upload and automatically retrain the recommendation models</p>
+        
+        <form id="csv-upload-form">
+            <div class="form-group">
+                <label>Select CSV File</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="csv-file" name="csv-file" accept=".csv" required>
+                    <label for="csv-file" class="file-input-label" id="file-label">
+                        📁 Click to select CSV file or drag and drop
+                    </label>
+                    <div id="file-name" class="file-name"></div>
+                </div>
+            </div>
+
+            <div class="progress-section" id="progress-section">
+                <p><strong>Upload Progress:</strong></p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill">0%</div>
+                </div>
+                <p id="progress-text" style="margin-top: 10px; color: #666; text-align: center;"></p>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-upload" id="submit-btn">Upload & Train</button>
+                <button type="button" class="btn-cancel" onclick="resetForm()">Clear</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Get admin name from localStorage
+    window.addEventListener('DOMContentLoaded', function() {
+        const adminToken = localStorage.getItem("admin_token");
+        const adminName = localStorage.getItem("admin_name");
+        
+        if (!adminToken) {
+            window.location.href = "/admin-login";
+            return;
+        }
+        
+        document.getElementById("admin-name").textContent = adminName || "Admin";
+    });
+
+    // File input handling
+    const fileInput = document.getElementById("csv-file");
+    const fileLabel = document.getElementById("file-label");
+    const fileName = document.getElementById("file-name");
+
+    fileInput.addEventListener("change", function() {
+        if (this.files.length > 0) {
+            fileName.textContent = "✓ " + this.files[0].name;
+        }
+    });
+
+    // Drag and drop
+    fileLabel.addEventListener("dragover", function(e) {
+        e.preventDefault();
+        this.classList.add("dragover");
+    });
+
+    fileLabel.addEventListener("dragleave", function() {
+        this.classList.remove("dragover");
+    });
+
+    fileLabel.addEventListener("drop", function(e) {
+        e.preventDefault();
+        this.classList.remove("dragover");
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            fileName.textContent = "✓ " + files[0].name;
+        }
+    });
+
+    // Form submission
+    document.getElementById("csv-upload-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById("csv-file");
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            showError("Please select a CSV file");
+            return;
+        }
+
+        if (file.size > 50 * 1024 * 1024) {
+            showError("File size exceeds 50 MB limit");
+            return;
+        }
+
+        uploadCSV(file);
+    });
+
+    function uploadCSV(file) {
+        const adminToken = localStorage.getItem("admin_token");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const submitBtn = document.getElementById("submit-btn");
+        const progressSection = document.getElementById("progress-section");
+        const progressFill = document.getElementById("progress-fill");
+        const progressText = document.getElementById("progress-text");
+
+        submitBtn.disabled = true;
+        progressSection.style.display = "block";
+        hideMessages();
+
+        showInfo("Uploading and training models... This may take a few minutes");
+
+        fetch("/api/upload-csv", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + adminToken
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                progressFill.style.width = "100%";
+                progressText.textContent = "✓ Complete";
+                showSuccess(data.message || "CSV uploaded and models retrained successfully!");
+                resetForm();
+                setTimeout(() => {
+                    document.getElementById("csv-file").value = "";
+                    fileName.textContent = "";
+                    progressSection.style.display = "none";
+                    submitBtn.disabled = false;
+                }, 3000);
+            } else {
+                showError(data.message || "Failed to upload CSV");
+                progressSection.style.display = "none";
+                submitBtn.disabled = false;
+            }
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            showError("An error occurred while uploading the file");
+            progressSection.style.display = "none";
+            submitBtn.disabled = false;
+        });
+    }
+
+    function resetForm() {
+        document.getElementById("csv-upload-form").reset();
+        document.getElementById("file-name").textContent = "";
+        hideMessages();
+    }
+
+    function showSuccess(message) {
+        const div = document.getElementById("success-message");
+        div.textContent = message;
+        div.style.display = "block";
+    }
+
+    function showError(message) {
+        const div = document.getElementById("error-message");
+        div.textContent = message;
+        div.style.display = "block";
+    }
+
+    function showInfo(message) {
+        const div = document.getElementById("info-message");
+        div.textContent = message;
+        div.style.display = "block";
+    }
+
+    function hideMessages() {
+        document.getElementById("success-message").style.display = "none";
+        document.getElementById("error-message").style.display = "none";
+        document.getElementById("info-message").style.display = "none";
+    }
+
+    function adminLogout() {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_name");
+        window.location.href = "/";
+    }
+</script>
+
+</body>
+</html>
