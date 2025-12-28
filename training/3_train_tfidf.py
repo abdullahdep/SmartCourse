@@ -3,6 +3,8 @@ import joblib
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import save_npz
+from tqdm import tqdm
+
 
 df = pd.read_csv("../data/courses_preprocessed.csv")
 
@@ -13,6 +15,7 @@ vectorizer = TfidfVectorizer(
     ngram_range=(1, 2),
     stop_words="english"
 )
+
 
 tfidf_matrix = vectorizer.fit_transform(corpus)
 

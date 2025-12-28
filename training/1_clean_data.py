@@ -1,12 +1,12 @@
 import pandas as pd
 
-df = pd.read_csv("raw_courses.csv")
+df = pd.read_csv("raw_courses.csv", encoding='latin-1')
 
 print("Original dataset:", df.shape)
 
 # Keep required columns only
-required_cols = ["Course Name", "University", "Difficulty Level",
-                 "Course Rating", "Course Description", "Department"]
+required_cols = ["Department", "University", "City/Cities",
+                 "Marks required", "Labs Avalible", "Course Description" ,"Admission dates" ,"shifts","online" ,"offered courses"]
 
 df = df[required_cols]
 
@@ -14,7 +14,7 @@ df = df[required_cols]
 df.dropna(subset=["Course Description"], inplace=True)
 
 # Remove duplicates
-df.drop_duplicates(subset=["Course Name", "Course Description"], inplace=True)
+df.drop_duplicates(subset=["offered courses", "Course Description"], inplace=True)
 
 # Reset index
 df.reset_index(drop=True, inplace=True)

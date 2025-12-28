@@ -16,7 +16,15 @@ def tfidf_recommend(query, df, top_k=10):
         results.append({
             "title": df.iloc[i]["University"],
             "department": df.iloc[i]["Department"],
+            "city": df.iloc[i]["City/Cities"],
             "description": df.iloc[i]["Course Description"],
+            "shifts": df.iloc[i]["shifts"],
+            "online": df.iloc[i]["online"],
+            "admission_dates": df.iloc[i]["Admission dates"],
+            "shifts": df.iloc[i]["shifts"],
+            "marks_required": df.iloc[i]["Marks required"],
+            "labs_available": df.iloc[i]["Labs Avalible"],
+
             "score": round(float(similarity[i] * 100), 2)
         })
     return results
