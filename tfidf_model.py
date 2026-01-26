@@ -24,6 +24,7 @@ def tfidf_recommend(query, df, top_k=10):
             "shifts": df.iloc[i]["shifts"],
             "marks_required": df.iloc[i]["Marks required"],
             "labs_available": df.iloc[i]["Labs Avalible"],
+            "courseoffered": df.iloc[i]["offered courses"],
 
             "score": round(float(similarity[i] * 100), 2)
         })

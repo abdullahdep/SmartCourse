@@ -1,0 +1,92 @@
+<pre>
+
+## 📘 About SmartCourse
+
+**SmartCourse** is an AI-powered course recommendation system designed to help learners discover relevant educational content based on their personal interests and learning goals. The system leverages **Natural Language Processing (NLP)** and **Machine Learning** techniques to understand user preferences expressed in natural language and recommend the most suitable courses accordingly.
+
+Unlike traditional recommendation systems that rely solely on keyword matching, SmartCourse integrates **two complementary recommendation approaches** to ensure accurate, diverse, and context-aware results.
+
+---
+
+## 🧠 Intelligent Recommendation Approach
+
+SmartCourse implements a **dual-model architecture**:
+
+### 🔹 TF-IDF Content-Based Model
+
+This model focuses on **keyword relevance** by analyzing exact terms and phrases in course descriptions. It uses:
+
+* TF-IDF vectorization with uni-grams and bi-grams
+* Cosine similarity for relevance scoring
+
+This approach performs well when users provide **clear, specific keywords**, such as technologies or programming languages.
+
+---
+
+### 🔹 Neural Semantic Model
+
+The neural model uses **sentence-transformers (all-MiniLM-L6-v2)** to generate dense semantic embeddings for course descriptions and user queries. It:
+
+* Understands **conceptual meaning** rather than exact words
+* Captures relationships between similar topics
+* Produces more flexible recommendations for **complex or vague queries**
+
+This allows SmartCourse to recommend relevant courses even when different terminology is used.
+
+---
+
+## ⚙️ System Workflow
+
+1. The user enters learning preferences in natural language
+2. The selected recommendation model processes the query
+3. Course descriptions are analyzed and compared using similarity measures
+4. The system returns the **top 10 most relevant courses** with relevance scores
+5. Users can save recommendations and review their search history
+
+Each query is processed independently, ensuring **fresh and unique recommendations** every time.
+
+---
+
+## 🗂 Dataset Information
+
+The system is built using a large-scale **Course Recommendation System Dataset** containing over **8,500 courses**.
+Each course record includes:
+
+* Course Title
+* University
+* Department
+* Difficulty Level
+* Course Rating
+* Detailed Course Description
+
+The dataset was carefully cleaned and preprocessed to remove duplicates, handle missing values, and standardize textual data for reliable model performance.
+
+---
+
+## 🧪 Performance Evaluation
+
+SmartCourse evaluates both recommendation models using:
+
+* Precision@K
+* Recall@K
+* Qualitative comparison of recommendation relevance
+
+The comparison highlights how **TF-IDF excels in keyword-based searches**, while the **Neural model performs better in semantic and intent-based queries**.
+
+---
+
+## 🛠 Technologies Used
+
+* **Backend:** Python, Flask, SQLite
+* **Machine Learning & NLP:** Scikit-learn, spaCy, Sentence-Transformers
+* **Frontend:** HTML5, Bootstrap 5, JavaScript
+* **Development Tools:** PyCharm, Git
+
+---
+
+## 🎯 Project Objective
+
+The goal of SmartCourse is to enhance the learning discovery experience by providing **accurate, personalized, and intelligent course recommendations**, demonstrating the practical application of NLP and machine learning in educational technology.
+
+---
+</pre>

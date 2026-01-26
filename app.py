@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template, session, redirect
-from database import init_db, save_history, get_history, create_user, verify_user, get_user, verify_admin
+from database import init_db, save_history, get_history, create_user, verify_user, get_user, verify_admin, save_favorite, get_favorites, delete_favorite, is_favorite
 from preprocessing import preprocess_text
 from tfidf_model import tfidf_recommend
 from neural_model import neural_recommend
@@ -19,37 +19,37 @@ DATABASE = 'smartcourse.db'  # path to your SQLite DB
 # Load dataset
 df = pd.read_csv("data/courses_cleaned.csv")
 
-# Function to retrain models when new CSV is uploaded
-def retrain_models(df_new):
-    """Retrain TF-IDF and Neural models with new data"""
-    import joblib
-    import numpy as np
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sentence_transformers import SentenceTransformer
+# # Function to retrain models when new CSV is uploaded
+# def retrain_models(df_new):
+#     """Retrain TF-IDF and Neural models with new data"""
+#     import joblib
+#     import numpy as np
+#     from sklearn.feature_extraction.text import TfidfVectorizer
+#     from sentence_transformers import SentenceTransformer
     
-    try:
-        # Retrain TF-IDF
-        corpus = df_new['Course Description'].fillna('').tolist()
-        vectorizer = TfidfVectorizer(ngram_range=(1,2), max_features=5000)
-        tfidf_matrix = vectorizer.fit_transform(corpus)
+#     try:
+#         # Retrain TF-IDF
+#         corpus = df_new['Course Description'].fillna('').tolist()
+#         vectorizer = TfidfVectorizer(ngram_range=(1,2), max_features=5000)
+#         tfidf_matrix = vectorizer.fit_transform(corpus)
         
-        import os
-        os.makedirs("models", exist_ok=True)
-        np.savez_compressed("models/tfidf_features.npz", tfidf_matrix.toarray())
-        joblib.dump(vectorizer, "models/tfidf_vectorizer.joblib")
+#         import os
+#         os.makedirs("models", exist_ok=True)
+#         np.savez_compressed("models/tfidf_features.npz", tfidf_matrix.toarray())
+#         joblib.dump(vectorizer, "models/tfidf_vectorizer.joblib")
         
-        # Retrain Neural model embeddings
-        model = SentenceTransformer("all-MiniLM-L6-v2")
-        embeddings = model.encode(corpus, convert_to_tensor=False)
-        np.save("models/course_embeddings.npy", embeddings)
+#         # Retrain Neural model embeddings
+#         model = SentenceTransformer("all-MiniLM-L6-v2")
+#         embeddings = model.encode(corpus, convert_to_tensor=False)
+#         np.save("models/course_embeddings.npy", embeddings)
         
-        # Reload global df for immediate use
-        global df
-        df = df_new
+#         # Reload global df for immediate use
+#         global df
+#         df = df_new
         
-    except Exception as e:
-        print(f"Error retraining models: {str(e)}")
-        raise
+#     except Exception as e:
+#         print(f"Error retraining models: {str(e)}")
+#         raise
 
 # Helper function to generate JWT token
 def generate_token(user_id):
@@ -157,93 +157,93 @@ def logout():
 
 # ---------------------- ADMIN ROUTES ----------------------
 
-@app.route("/admin-login")
-def admin_login_page():
-    return render_template("admin-login.html")
+# @app.route("/admin-login")
+# def admin_login_page():
+#     return render_template("admin-login.html")
 
-@app.route("/admin-dashboard")
-def admin_dashboard_page():
-    # Admin dashboard doesn't need token in URL - it checks localStorage in template
-    return render_template("admin-dashboard.html")
+# @app.route("/admin-dashboard")
+# def admin_dashboard_page():
+#     # Admin dashboard doesn't need token in URL - it checks localStorage in template
+#     return render_template("admin-dashboard.html")
 
-@app.route("/api/admin-login", methods=["POST"])
-def admin_login():
-    data = request.json
-    username = data.get("username")
-    password = data.get("password")
+# @app.route("/api/admin-login", methods=["POST"])
+# def admin_login():
+#     data = request.json
+#     username = data.get("username")
+#     password = data.get("password")
     
-    if not username or not password:
-        return jsonify({"success": False, "message": "Missing username or password"}), 400
+#     if not username or not password:
+#         return jsonify({"success": False, "message": "Missing username or password"}), 400
     
-    if verify_admin(username, password):
-        import hashlib
-        import time
-        # Generate a simple admin token
-        token_data = f"{username}:{int(time.time())}"
-        token = hashlib.sha256(token_data.encode()).hexdigest()
-        return jsonify({
-            "success": True,
-            "token": token,
-            "admin_name": username
-        })
-    else:
-        return jsonify({"success": False, "message": "Invalid admin credentials"}), 401
+#     if verify_admin(username, password):
+#         import hashlib
+#         import time
+#         # Generate a simple admin token
+#         token_data = f"{username}:{int(time.time())}"
+#         token = hashlib.sha256(token_data.encode()).hexdigest()
+#         return jsonify({
+#             "success": True,
+#             "token": token,
+#             "admin_name": username
+#         })
+#     else:
+#         return jsonify({"success": False, "message": "Invalid admin credentials"}), 401
 
-@app.route("/api/upload-csv", methods=["POST"])
-def upload_csv():
-    admin_token = request.headers.get('Authorization')
-    if not admin_token or not admin_token.startswith("Bearer "):
-        return jsonify({"success": False, "message": "Admin authentication required"}), 401
+# @app.route("/api/upload-csv", methods=["POST"])
+# def upload_csv():
+#     admin_token = request.headers.get('Authorization')
+#     if not admin_token or not admin_token.startswith("Bearer "):
+#         return jsonify({"success": False, "message": "Admin authentication required"}), 401
     
-    # Check if file is in request
-    if 'file' not in request.files:
-        return jsonify({"success": False, "message": "No file provided"}), 400
+#     # Check if file is in request
+#     if 'file' not in request.files:
+#         return jsonify({"success": False, "message": "No file provided"}), 400
     
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"success": False, "message": "No file selected"}), 400
+#     file = request.files['file']
+#     if file.filename == '':
+#         return jsonify({"success": False, "message": "No file selected"}), 400
     
-    if not file.filename.endswith('.csv'):
-        return jsonify({"success": False, "message": "Only CSV files are allowed"}), 400
+#     if not file.filename.endswith('.csv'):
+#         return jsonify({"success": False, "message": "Only CSV files are allowed"}), 400
     
-    try:
-        # Read and validate CSV
-        df_new = pd.read_csv(file)
+#     try:
+#         # Read and validate CSV
+#         df_new = pd.read_csv(file)
         
-        # Check required columns
-        required_columns = ["University", "Department", "City/Cities", "Course Description", 
-                          "shifts", "online", "Admission dates", "Marks required", "Labs Avalible"]
-        missing_columns = [col for col in required_columns if col not in df_new.columns]
-        if missing_columns:
-            return jsonify({
-                "success": False, 
-                "message": f"CSV missing required columns: {', '.join(missing_columns)}"
-            }), 400
+#         # Check required columns
+#         required_columns = ["University", "Department", "City/Cities", "Course Description", 
+#                           "shifts", "online", "Admission dates", "Marks required", "Labs Avalible"]
+#         missing_columns = [col for col in required_columns if col not in df_new.columns]
+#         if missing_columns:
+#             return jsonify({
+#                 "success": False, 
+#                 "message": f"CSV missing required columns: {', '.join(missing_columns)}"
+#             }), 400
         
-        # Save the cleaned CSV
-        df_new.to_csv("data/courses_cleaned.csv", index=False)
+#         # Save the cleaned CSV
+#         df_new.to_csv("data/courses_cleaned.csv", index=False)
         
-        # Retrain models
-        retrain_models(df_new)
+#         # Retrain models
+#         retrain_models(df_new)
         
-        return jsonify({
-            "success": True,
-            "message": f"CSV uploaded successfully! {len(df_new)} courses loaded and models retrained."
-        })
+#         return jsonify({
+#             "success": True,
+#             "message": f"CSV uploaded successfully! {len(df_new)} courses loaded and models retrained."
+#         })
         
-    except pd.errors.ParserError:
-        return jsonify({"success": False, "message": "Invalid CSV format"}), 400
-    except Exception as e:
-        return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
+#     except pd.errors.ParserError:
+#         return jsonify({"success": False, "message": "Invalid CSV format"}), 400
+#     except Exception as e:
+#         return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
 
-@app.route("/api/current-user", methods=["GET"])
-@login_required
-def current_user(user_id):
-    user = get_user(user_id)
-    if user:
-        return jsonify({"success": True, "user": user})
-    else:
-        return jsonify({"success": False, "message": "User not found"}), 404
+# @app.route("/api/current-user", methods=["GET"])
+# @login_required
+# def current_user(user_id):
+#     user = get_user(user_id)
+#     if user:
+#         return jsonify({"success": True, "user": user})
+#     else:
+#         return jsonify({"success": False, "message": "User not found"}), 404
 
 # ---------------------- PAGE ROUTES ----------------------
 
@@ -267,17 +267,45 @@ def dashboard_page():
     if isinstance(auth_result, int):
         # User is authenticated
         user_id = auth_result
-        data = get_history(user_id)  # Get history only for this user
-        # Optionally, parse results JSON if you want to display top courses
+        
+        # Get history
+        raw_history = get_history(user_id)  # Get history only for this user
         history = []
-        for row in data:
+        for row in raw_history:
+            # row = (query, model, results_json, timestamp)
+            query = row[0]
+            model = row[1]
+            results_str = row[2]
+            timestamp = row[3]
+            
+            # Parse results
+            try:
+                results = json.loads(results_str)
+            except:
+                results = results_str
+            
+            # For old format (single model), convert to new format
+            if model in ['tfidf', 'neural']:
+                # Old format - results is a list
+                if isinstance(results, list):
+                    if model == 'tfidf':
+                        results = {"tfidf": results, "neural": []}
+                    else:
+                        results = {"tfidf": [], "neural": results}
+                model = "both"  # Mark as both for consistency
+            
+            # Add to history as dict (compatible with template)
             history.append({
-                "query": row[0],
-                "model": row[1],
-                "results": json.loads(row[2]),  # convert JSON string back to Python object
-                "timestamp": row[3]
+                "query": query,
+                "model": model,
+                "results": results,
+                "timestamp": timestamp
             })
-        return render_template("dashboard.html", history=history, enumerate=enumerate)
+        
+        # Get favorites
+        favorites = get_favorites(user_id)
+        
+        return render_template("dashboard.html", history=history, favorites=favorites, enumerate=enumerate)
     else:
         # Not authenticated, auth_result is a redirect response
         return auth_result
@@ -299,14 +327,23 @@ def recommend(user_id):
 
     clean_query = preprocess_text(query)
 
-    if model_type == "tfidf":
-        results = tfidf_recommend(clean_query, df)
-    else:
-        results = neural_recommend(clean_query, df)
+    # Always get both models' results
+    tfidf_results = tfidf_recommend(clean_query, df)
+    neural_results = neural_recommend(clean_query, df)
 
-    save_history(user_id, query, model_type, results)
+    # Save history with both results and comparison data
+    comparison_data = {
+        "tfidf": tfidf_results,
+        "neural": neural_results
+    }
+    save_history(user_id, query, "both", comparison_data)
 
-    return jsonify({"results": results})
+    return jsonify({
+        "results": tfidf_results,  # For backward compatibility
+        "tfidf": tfidf_results,
+        "neural": neural_results,
+        "comparison": comparison_data
+    })
 
 
 @app.route("/api/history", methods=["GET"])
@@ -322,6 +359,61 @@ def save(user_id):
     data = request.json
     save_history(user_id, data["query"], data["model"], data["results"])
     return jsonify({"status": "saved"})
+
+
+# ---------------------- FAVORITE ROUTES ----------------------
+
+@app.route("/api/favorite", methods=["POST"])
+@login_required
+def add_favorite(user_id):
+    """Save a course to user's favorites"""
+    data = request.json
+    course_title = data.get("course_title")
+    course_data = data.get("course_data")
+    
+    if not course_title or not course_data:
+        return jsonify({"success": False, "message": "Missing course information"}), 400
+    
+    if save_favorite(user_id, course_title, course_data):
+        return jsonify({"success": True, "message": "Course added to favorites"})
+    else:
+        return jsonify({"success": False, "message": "Course already in favorites"}), 400
+
+
+@app.route("/api/unfavorite", methods=["POST"])
+@login_required
+def remove_favorite(user_id):
+    """Remove a course from user's favorites"""
+    data = request.json
+    course_title = data.get("course_title")
+    
+    if not course_title:
+        return jsonify({"success": False, "message": "Missing course title"}), 400
+    
+    delete_favorite(user_id, course_title)
+    return jsonify({"success": True, "message": "Course removed from favorites"})
+
+
+@app.route("/api/favorites", methods=["GET"])
+@login_required
+def get_user_favorites(user_id):
+    """Get all favorite courses for the current user"""
+    favorites = get_favorites(user_id)
+    return jsonify({"success": True, "favorites": favorites})
+
+
+@app.route("/api/is-favorite", methods=["POST"])
+@login_required
+def check_favorite(user_id):
+    """Check if a course is favorited"""
+    data = request.json
+    course_title = data.get("course_title")
+    
+    if not course_title:
+        return jsonify({"success": False, "message": "Missing course title"}), 400
+    
+    is_fav = is_favorite(user_id, course_title)
+    return jsonify({"success": True, "is_favorite": is_fav})
 
 
 if __name__ == "__main__":

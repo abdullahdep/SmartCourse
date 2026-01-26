@@ -25,6 +25,7 @@ def neural_recommend(query, df):
             "admission_dates": df.iloc[i]["Admission dates"],
             "marks_required": df.iloc[i]["Marks required"],
             "labs_available": df.iloc[i]["Labs Avalible"],
+            "courseoffered": df.iloc[i]["offered courses"],
             "score": float(score * 100)
         })
 

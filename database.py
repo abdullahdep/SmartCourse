@@ -29,6 +29,17 @@ def init_db():
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )
         """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS favorites (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                course_title TEXT,
+                course_data TEXT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                UNIQUE(user_id, course_title)
+            )
+        """)
         conn.commit()
         
         # Create test user if it doesn't exist
@@ -108,6 +119,61 @@ def get_history(user_id=None):
         return data
     finally:
         conn.close()
+
+def save_favorite(user_id, course_title, course_data):
+    """Save a course to user's favorites"""
+    conn = sqlite3.connect("smartcourse.db", timeout=10)
+    try:
+        c = conn.cursor()
+        c.execute("INSERT INTO favorites (user_id, course_title, course_data) VALUES (?, ?, ?)",
+                  (user_id, course_title, json.dumps(course_data)))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        # Course already favorited
+        return False
+    finally:
+        conn.close()
+
+def get_favorites(user_id):
+    """Get all favorite courses for a user"""
+    conn = sqlite3.connect("smartcourse.db", timeout=10)
+    try:
+        c = conn.cursor()
+        c.execute("SELECT course_title, course_data, timestamp FROM favorites WHERE user_id = ? ORDER BY timestamp DESC", (user_id,))
+        data = c.fetchall()
+        result = []
+        for row in data:
+            result.append({
+                "title": row[0],
+                "data": json.loads(row[1]),
+                "timestamp": row[2]
+            })
+        return result
+    finally:
+        conn.close()
+
+def delete_favorite(user_id, course_title):
+    """Remove a course from user's favorites"""
+    conn = sqlite3.connect("smartcourse.db", timeout=10)
+    try:
+        c = conn.cursor()
+        c.execute("DELETE FROM favorites WHERE user_id = ? AND course_title = ?", (user_id, course_title))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+def is_favorite(user_id, course_title):
+    """Check if a course is favorited by user"""
+    conn = sqlite3.connect("smartcourse.db", timeout=10)
+    try:
+        c = conn.cursor()
+        c.execute("SELECT id FROM favorites WHERE user_id = ? AND course_title = ?", (user_id, course_title))
+        return c.fetchone() is not None
+    finally:
+        conn.close()
+
 # Admin authentication
 ADMIN_USERNAME = "Iqra"
 ADMIN_PASSWORD_HASH = generate_password_hash("Iqra@1234")

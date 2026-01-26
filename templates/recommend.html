@@ -152,9 +152,111 @@
             padding: 20px;
             color: #666;
         }
+        .favorite-btn {
+            transition: opacity 0.3s, transform 0.2s;
+        }
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+        .favorite-btn.favorited {
+            opacity: 1 !important;
+        }
+        /* Loading Animation */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: white;
+            margin-left: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        /* Result Tabs */
+        .results-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        .results-tabs button {
+            flex: 0 1 auto;
+            padding: 12px 20px;
+            background: white;
+            color: #333;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .results-tabs button:hover {
+            background: #f0f0f0;
+            border-bottom-color: #ddd;
+        }
+        .results-tabs button.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+            background: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .comparison-column h4 {
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .comparison-column h4.tfidf {
+            border-bottom-color: #007bff;
+            color: #007bff;
+        }
+        .comparison-column h4.neural {
+            border-bottom-color: #28a745;
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Finding best courses for you...</div>
+</div>
 
 <div class="navbar">
     <h1>SmartCourse</h1>
@@ -176,10 +278,10 @@
         </div>
         
         <div class="form-group">
-            <label for="model">Select Speed:</label>
+            <label for="model">Model Reference:</label>
             <select id="model">
-                <option value="tfidf">Fast Response</option>
-                <option value="neural">Accurate Response</option>
+                <option value="tfidf">TF-IDF (Faster)</option>
+                <option value="neural">Neural (More Accurate)</option>
             </select>
         </div>
         
