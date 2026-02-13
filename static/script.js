@@ -74,7 +74,8 @@ function getRecommendations() {
             document.getElementById("loadingOverlay").classList.remove("active");
             
             if (data && (data.results || data.tfidf || data.neural)) {
-                displayResults(data);
+                const model = document.getElementById("model").value;
+                displayResults(data, model);
             } else if (data && data.message) {
                 alert("Error getting recommendations: " + data.message);
             } else {
@@ -88,7 +89,7 @@ function getRecommendations() {
         });
 }
 
-function displayResults(data) {
+function displayResults(data, selectedModel = 'tfidf') {
     let box = document.getElementById("results");
     box.innerHTML = "";
 
@@ -101,18 +102,23 @@ function displayResults(data) {
         return;
     }
 
-    // Create tabs
+    // Determine which model to show first
+    const isNeuralSelected = selectedModel === 'neural';
+    const firstModel = isNeuralSelected ? 'neural' : 'tfidf';
+    const secondModel = isNeuralSelected ? 'tfidf' : 'neural';
+
+    // Create tabs - show selected model first
     let tabsHTML = `
         <div class="results-tabs">
-            <button class="tab-button active" onclick="switchTab('tfidf')">📊 TF-IDF Results</button>
-            <button class="tab-button" onclick="switchTab('neural')">🧠 Neural Results</button>
+            <button class="tab-button ${firstModel === 'neural' ? 'active' : ''}" onclick="switchTab('neural')">🧠 Neural Results</button>
+            <button class="tab-button ${firstModel === 'tfidf' ? 'active' : ''}" onclick="switchTab('tfidf')">📊 TF-IDF Results</button>
             <button class="tab-button" onclick="switchTab('comparison')">⚖️ Comparison</button>
         </div>
     `;
 
     // TFIDF Tab Content
     let tfidfHTML = `
-        <div id="tfidf-tab" class="tab-content active">
+        <div id="tfidf-tab" class="tab-content ${firstModel === 'tfidf' ? 'active' : ''}">
             <h4 style="color: #007bff;">TF-IDF Model Results</h4>
     `;
     
@@ -127,7 +133,7 @@ function displayResults(data) {
 
     // Neural Tab Content
     let neuralHTML = `
-        <div id="neural-tab" class="tab-content">
+        <div id="neural-tab" class="tab-content ${firstModel === 'neural' ? 'active' : ''}">
             <h4 style="color: #28a745;">Neural Model Results</h4>
     `;
     
@@ -178,7 +184,7 @@ function displayResults(data) {
     `;
 
     // Combine all HTML
-    box.innerHTML = tabsHTML + tfidfHTML + neuralHTML + comparisonHTML;
+    box.innerHTML = tabsHTML + neuralHTML + tfidfHTML + comparisonHTML;
 
     // Load favorites and update star colors
     loadAndHighlightFavorites(tfidfResults.concat(neuralResults));

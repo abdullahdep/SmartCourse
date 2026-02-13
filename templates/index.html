@@ -1,125 +1,350 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>SmartCourse – Home</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCourse – AI Course Recommendations</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+        
+        html, body {
+            height: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Navigation Bar */
         .navbar {
-            background-color: #333;
-            padding: 15px 30px;
+            background: white;
+            padding: 16px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
-            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .navbar h1 {
-            margin: 0;
+        
+        .navbar-brand h1 {
             font-size: 24px;
+            font-weight: 700;
+            color: #0066cc;
+            letter-spacing: -0.5px;
         }
+        
         .navbar-right {
             display: flex;
-            gap: 15px;
+            gap: 24px;
             align-items: center;
         }
-        .navbar a, .navbar button {
-            color: white;
+        
+        .navbar a {
+            color: #555;
             text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            background-color: #555;
-            transition: background-color 0.3s;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.3s ease;
         }
-        .navbar a:hover, .navbar button:hover {
-            background-color: #777;
+        
+        .navbar a:hover {
+            color: #0066cc;
         }
-        .navbar .logout-btn {
-            background-color: #dc3545;
-        }
-        .navbar .logout-btn:hover {
-            background-color: #c82333;
-        }
-        .navbar .welcome-msg {
-            background-color: transparent;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #0066cc 0%, #00c9a7 100%);
+            padding: 80px 40px;
             text-align: center;
+            color: white;
         }
-        .container h1 {
+        
+        .hero-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            font-weight: 300;
+            opacity: 0.95;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary {
+            background-color: white;
+            color: #0066cc;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Features Section */
+        .features-section {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 40px;
+        }
+        
+        .section-title {
+            text-align: center;
             font-size: 36px;
-            margin-bottom: 20px;
+            font-weight: 700;
+            margin-bottom: 48px;
             color: #333;
         }
-        .container p {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-bottom: 48px;
         }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 16px;
+        
+        .feature-card {
+            background: white;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-top: 4px solid #0066cc;
+        }
+        
+        .feature-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
             display: inline-block;
-            transition: background-color 0.3s;
         }
-        .btn-primary:hover {
-            background-color: #0056b3;
+        
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #333;
         }
-        .auth-needed {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 4px;
-            margin-bottom: 30px;
+        
+        .feature-card p {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.7;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+        
+        /* Auth Section */
+        .auth-container {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .auth-container h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #333;
+        }
+        
+        .auth-container p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+        
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 60px;
+        }
+        
+        footer p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+            
+            .hero {
+                padding: 60px 20px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .container,
+            .features-section {
+                padding: 0 20px;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .section-title {
+                font-size: 28px;
+                margin-bottom: 32px;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <h1>SmartCourse</h1>
+<nav class="navbar">
+    <div class="navbar-brand">
+        <h1>SmartCourse</h1>
+    </div>
     <div class="navbar-right" id="navbar-content">
-        <!-- JavaScript will populate this -->
+        <!-- Navigation will populate here -->
+    </div>
+</nav>
+
+<div class="hero">
+    <div class="hero-content">
+        <h1>Discover Your Perfect Course</h1>
+        <p>Powered by advanced AI and machine learning to understand your learning goals and recommend the best courses for you</p>
+        <div class="cta-buttons" id="hero-buttons">
+            <!-- Buttons populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+    <h2 class="section-title">Why Choose SmartCourse?</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🧠</div>
+            <h3>Natural Language Understanding</h3>
+            <p>Simply describe what you want to learn in your own words, and our AI understands your intent to recommend relevant courses.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <h3>Dual Recommendation Models</h3>
+            <p>Compare keyword-based and semantic recommendations. Choose between TF-IDF for precision or Neural networks for deeper understanding.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Smart Relevance Scoring</h3>
+            <p>Every recommendation comes with a relevance score (0–100%) so you know exactly how well each course matches your needs.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Personalized Results</h3>
+            <p>Each search is processed independently with cutting-edge ML algorithms to deliver fresh, context-aware recommendations.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">💾</div>
+            <h3>Save & Track Your Journey</h3>
+            <p>Save your favorite courses and review your search history through your personal dashboard. Never lose track of a great find.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Lightning Fast Results</h3>
+            <p>Get instant recommendations powered by pre-trained models and optimized algorithms for seamless user experience.</p>
+        </div>
     </div>
 </div>
 
 <div class="container">
-    <pre>
-        🚀 System Capabilities
-
-🧠 Natural Language Understanding
-Enter learning preferences such as “I want to learn Python for data science” and receive meaningful recommendations.
-
-🔄 Dual Recommendation Models
-
-TF-IDF Model: Keyword-based matching for precise, term-focused searches
-
-Neural Model: Semantic understanding using deep learning for intent-based recommendations
-
-📊 Smart Relevance Scoring
-Courses are ranked with relevance scores (0–100%) to help users quickly identify the best matches.
-
-📚 Personalized Results
-Each query is processed independently, ensuring fresh and context-aware recommendations for different user preferences.
-
-💾 Save & Track Recommendations
-Users can save preferred courses and review their search history through a dedicated dashboard.
-    </pre>
-    
-    <div id="auth-section">
+    <div class="auth-container" id="auth-section">
         <!-- JavaScript will populate this based on login status -->
     </div>
 </div>
+
+<footer>
+    <p>&copy; 2026 SmartCourse. Powered by AI and machine learning for better learning discovery.</p>
+</footer>
 
 <script>
     function checkAuth() {
@@ -127,35 +352,31 @@ Users can save preferred courses and review their search history through a dedic
         const username = localStorage.getItem("username");
         const navContent = document.getElementById("navbar-content");
         const authSection = document.getElementById("auth-section");
+        const heroButtons = document.getElementById("hero-buttons");
         
         if (token) {
-            // User is logged in
-            navContent.innerHTML = `
-                <span class="welcome-msg">Welcome, <strong>${username}</strong></span>
-                <a href="/recommend?token=${encodeURIComponent(token)}">Start Recommendation</a>
-                <a href="/dashboard?token=${encodeURIComponent(token)}">Dashboard</a>
-                <a href="/about">About</a>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            `;
-            authSection.innerHTML = `
-                <p style="color: #28a745; margin: 20px 0;"><strong>✓ You are logged in and ready to get recommendations!</strong></p>
-                <a href="/recommend?token=${encodeURIComponent(token)}" class="btn-primary">Get Course Recommendations</a>
-            `;
+            // User is logged in - redirect to dashboard
+            window.location.href = "/dashboard";
+            return;
         } else {
-            // User is not logged in
+            // User is not logged in - show login/register options
             navContent.innerHTML = `
                 <a href="/login">Login</a>
                 <a href="/register">Register</a>
                 <a href="/about">About</a>
-                <a href="/admin-login" style="background-color: #ff6b6b;">Admin</a>
             `;
+            
+            heroButtons.innerHTML = `
+                <a href="/register" class="btn btn-primary">Get Started Free</a>
+                <a href="/login" class="btn btn-secondary">Sign In</a>
+            `;
+            
             authSection.innerHTML = `
-                <div class="auth-needed">
-                    <p><strong>To get personalized course recommendations, please login or register.</strong></p>
-                    <p style="margin: 20px 0;">
-                        <a href="/register" class="btn-primary">Create Account</a>
-                    </p>
-                    <p>Already have an account? <a href="/login" style="color: #007bff;">Login here</a></p>
+                <h2>Ready to Find Your Next Learning Adventure?</h2>
+                <p>Join thousands of learners who are discovering courses tailored to their goals with SmartCourse</p>
+                <div class="cta-buttons">
+                    <a href="/register" class="btn btn-primary">Create Free Account</a>
+                    <a href="/login" class="btn btn-secondary">Sign In</a>
                 </div>
             `;
         }
@@ -173,5 +394,8 @@ Users can save preferred courses and review their search history through a dedic
     }
     
     // Check authentication on page load
-    checkAuth();
+    window.addEventListener('DOMContentLoaded', checkAuth);
 </script>
+
+</body>
+</html>

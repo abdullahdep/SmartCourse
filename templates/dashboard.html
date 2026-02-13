@@ -4,221 +4,65 @@
     <title>Dashboard - History & Favorites</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f5f5f5;
-        }
-        .navbar {
-            background-color: #333;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-            margin-bottom: 30px;
-            border-radius: 4px;
-        }
-        .navbar h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .navbar-right {
-            display: flex;
-            gap: 15px;
-        }
-        .navbar a, .navbar button {
-            color: white;
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            background-color: #555;
-            transition: background-color 0.3s;
-        }
-        .navbar a:hover, .navbar button:hover {
-            background-color: #777;
-        }
-        .navbar .logout-btn {
-            background-color: #dc3545;
-        }
-        .navbar .logout-btn:hover {
-            background-color: #c82333;
-        }
-        .container {
-            max-width: 1400px;
-        }
-        .tab-content {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .nav-tabs .nav-link {
-            color: #333;
-            border: 1px solid #ddd;
-            margin-right: 5px;
-        }
-        .nav-tabs .nav-link.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-        .side-by-side {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        .results-section h4 {
-            color: #007bff;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #007bff;
-        }
-        .result-item {
-            background: #f9f9f9;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border-left: 4px solid #007bff;
-        }
-        .result-item strong {
-            color: #333;
-        }
-        .result-item p {
-            margin: 8px 0;
-            color: #666;
-        }
-        .favorite-item {
-            background: #fff9e6;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border-left: 4px solid #ffc107;
-        }
-        .favorite-item strong {
-            color: #333;
-        }
-        .favorite-item .timestamp {
-            font-size: 0.85em;
-            color: #999;
-            margin-top: 10px;
-        }
-        .empty-message {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif; background: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
+        .main-content { flex: 1; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+        .nav-tabs { border-bottom: 2px solid #0066cc; }
+        .nav-tabs .nav-link { color: #333; font-weight: 600; border: none; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .nav-tabs .nav-link:hover { color: #0066cc; border-bottom-color: #ddd; }
+        .nav-tabs .nav-link.active { color: #0066cc; border-bottom-color: #0066cc; background: white; }
+        h3 { color: #333; margin-bottom: 20px; font-size: 20px; }
+        h5 { color: #333; margin-top: 0; }
+        .favorite-item { background: #f8f9fa; padding: 20px; border-radius: 5px; border-left: 4px solid #0066cc; }
+        .favorite-item h5 { color: #0066cc; }
+        .favorite-item .timestamp { font-size: 0.85em; color: #999; margin-top: 10px; }
+        .empty-message { text-align: center; padding: 40px; color: #999; }
+        .empty-message a { color: #0066cc; font-weight: 600; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .tab-content { background: transparent; padding: 20px 0; }
+        .history-row { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #0066cc; }
+        .result-col { flex: 1; padding: 15px; background-color: #f9f9f9; border-radius: 5px; margin-right: 15px; }
+        .result-col:last-child { margin-right: 0; }
+        .result-title { font-weight: 600; color: #0066cc; margin-bottom: 10px; font-size: 12px; text-transform: uppercase; }
+        .result-item { padding: 10px 0; border-bottom: 1px solid #e0e0e0; font-size: 14px; color: #333; }
+        .result-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <h1>SmartCourse Dashboard</h1>
-    <div class="navbar-right">
-        <a href="/">Home</a>
-        <a href="/recommend?token=current">Get Recommendations</a>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+{% include 'header.html' %}
+
+<div class="main-content">
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">Search History</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab">Favorite Courses (0)</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            
+            <!-- HISTORY TAB -->
+            <div class="tab-pane fade show active" id="history" role="tabpanel">
+                <p style="text-align: center; color: #999; padding: 40px;">Loading...</p>
+            </div>
+
+            <!-- FAVORITES TAB -->
+            <div class="tab-pane fade" id="favorites" role="tabpanel">
+                <p style="text-align: center; color: #999; padding: 40px;">Loading...</p>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="container mt-5">
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">Search History</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab">Favorite Courses ({% if favorites %}{{ favorites|length }}{% else %}0{% endif %})
-            </button>
-        </li>
-    </ul>
-
-    <!-- Tab Content -->
-    <div class="tab-content" id="dashboardTabContent">
-        
-        <!-- HISTORY TAB -->
-        <div class="tab-pane fade show active" id="history" role="tabpanel">
-            <h3>Your Search History</h3>
-            {% if history %}
-                {% for i, entry in enumerate(history, 1) %}
-                <div style="margin-bottom: 60px; padding-bottom: 40px; border-bottom: 2px solid #ddd;">
-                    <!-- Search Query Header -->
-                    <h5 style="color: #333; font-weight: bold; margin-bottom: 25px; font-size: 18px;">
-                        Search query {{ i }}: <span style="color: #007bff;">{{ entry.query }}</span>
-                    </h5>
-                    <p><small class="text-muted" style="display: block; margin-bottom: 20px;">Model: <strong>{{ entry.model|upper }}</strong> | {{ entry.timestamp }}</small></p>
-                    
-                    <!-- Two Column Layout: TFIDF (left) and Neural (right) -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-                        <!-- Column 1: TFIDF -->
-                        <div>
-                            <h6 style="color: #495057; font-weight: bold; text-transform: uppercase; font-size: 13px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #007bff;">TFIDF</h6>
-                            {% if entry.results.tfidf and entry.results.tfidf|length > 0 %}
-                                {% for r in entry.results.tfidf %}
-                                <div class="result-item" style="margin-bottom: 15px;">
-                                    <strong style="color: #007bff;">{{ r.courseoffered }}</strong>
-                                    <p style="margin: 8px 0; font-size: 0.9em;"><strong>Department:</strong> {{ r.department or 'N/A' }}</p>
-                                    <p style="margin: 8px 0; font-size: 0.9em;"><strong>University:</strong> {{ r.title or 'N/A' }}</p>
-                                    <p style="margin: 8px 0; font-size: 0.9em;"><strong>Score:</strong> <span style="background: #e7f3ff; padding: 2px 6px; border-radius: 3px;">{{ r.score }}%</span></p>
-                                </div>
-                                {% endfor %}
-                            {% else %}
-                                <p style="color: #999; font-style: italic;">No TF-IDF results</p>
-                            {% endif %}
-                        </div>
-
-                        <!-- Column 2: Neural -->
-                        <div>
-                            <h6 style="color: #495057; font-weight: bold; text-transform: uppercase; font-size: 13px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #28a745;">NEURAL</h6>
-                            {% if entry.results.neural and entry.results.neural|length > 0 %}
-                                {% for r in entry.results.neural %}
-                                <div class="result-item" style="margin-bottom: 15px; border-left-color: #28a745;">
-                                    <strong style="color: #28a745;">{{ r.courseoffered }}</strong>
-                                    <p style="margin: 8px 0; font-size: 0.9em;"><strong>Department:</strong> {{ r.department or 'N/A' }}</p>
-                                    <p style="margin: 8px 0; font-size: 0.9em;"><strong>University:</strong> {{ r.title or 'N/A' }}</p>
-                                    <p style="margin: 8px 0; font-size: 0.9em;"><strong>Score:</strong> <span style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px;">{{ r.score }}%</span></p>
-                                </div>
-                                {% endfor %}
-                            {% else %}
-                                <p style="color: #999; font-style: italic;">No Neural results</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-message">
-                    <p>No search history yet. <a href="/recommend?token=current">Start searching</a> for courses!</p>
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- FAVORITES TAB -->
-        <div class="tab-pane fade" id="favorites" role="tabpanel">
-            <h3>Your Favorite Courses</h3>
-            {% if favorites %}
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-                    {% for fav in favorites %}
-                    <div class="favorite-item">
-                        <h5>⭐ {{ fav.title }}</h5>
-                        <p><strong>Added:</strong> {{ fav.timestamp }}</p>
-                        {% if fav.data %}
-                            <hr style="margin: 10px 0;">
-                            <p><small>{{ fav.data }}</small></p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-message">
-                    <p>No favorite courses yet! <a href="/recommend?token=current">Start searching</a> and click the star (⭐) to save courses.</p>
-                </div>
-            {% endif %}
-        </div>
-
-    </div>
-</div>
+{% include 'footer.html' %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -233,20 +77,171 @@
         });
     }
 
-    // Get token from URL parameter
     function getTokenFromURL() {
         const params = new URLSearchParams(window.location.search);
         return params.get('token');
     }
 
-    // Extract token from URL on page load
+    // Load history from API
+    function loadHistory() {
+        const token = localStorage.getItem("auth_token");
+        if (!token) {
+            document.getElementById("history").innerHTML = '<div class="empty-message"><p>Please <a href="/login">login</a> to view your search history.</p></div>';
+            return;
+        }
+
+        fetch("/api/history", {
+            headers: { "Authorization": "Bearer " + token }
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log("History data received:", data);
+            if (data.success && data.history && data.history.length > 0) {
+                let historyHTML = '<h3>Your Search History</h3>';
+                data.history.forEach((entry, i) => {
+                    historyHTML += `
+                        <div class="history-row">
+                            <h5>Search query ${i + 1}: <span style="color: #667eea;">${escapeHtml(entry.query)}</span></h5>
+                            <p><small class="text-muted">Model: <strong>${entry.model.toUpperCase()}</strong> | ${entry.timestamp}</small></p>
+                    `;
+                    
+                    if (entry.results) {
+                        const results = typeof entry.results === 'string' ? JSON.parse(entry.results) : entry.results;
+                        const tfidfResults = results.tfidf || [];
+                        const neuralResults = results.neural || [];
+                        
+                        if (tfidfResults.length > 0 || neuralResults.length > 0) {
+                            historyHTML += '<div style="display: flex; gap: 20px; margin-top: 15px;">';
+                            
+                            if (tfidfResults.length > 0) {
+                                historyHTML += '<div class="result-col"><div class="result-title">📊 TF-IDF Results</div>';
+                                tfidfResults.slice(0, 3).forEach(result => {
+                                    const score = result.score ? (typeof result.score === 'number' ? result.score : parseFloat(result.score)) : 0;
+                                    historyHTML += `
+                                        <div class="result-item">
+                                            <strong>${escapeHtml(result.title)}</strong>
+                                            <br><small style="color: #666;">Score: ${score.toFixed(1)}%</small>
+                                        </div>
+                                    `;
+                                });
+                                if (tfidfResults.length > 3) {
+                                    historyHTML += `<div style="color: #999; font-size: 12px; margin-top: 10px;">+${tfidfResults.length - 3} more</div>`;
+                                }
+                                historyHTML += '</div>';
+                            }
+                            
+                            if (neuralResults.length > 0) {
+                                historyHTML += '<div class="result-col"><div class="result-title">🧠 Neural Results</div>';
+                                neuralResults.slice(0, 3).forEach(result => {
+                                    const score = result.score ? (typeof result.score === 'number' ? result.score : parseFloat(result.score)) : 0;
+                                    historyHTML += `
+                                        <div class="result-item">
+                                            <strong>${escapeHtml(result.title)}</strong>
+                                            <br><small style="color: #666;">Score: ${score.toFixed(1)}%</small>
+                                        </div>
+                                    `;
+                                });
+                                if (neuralResults.length > 3) {
+                                    historyHTML += `<div style="color: #999; font-size: 12px; margin-top: 10px;">+${neuralResults.length - 3} more</div>`;
+                                }
+                                historyHTML += '</div>';
+                            }
+                            
+                            historyHTML += '</div>';
+                        } else {
+                            historyHTML += '<p class="text-muted">No results available for this search.</p>';
+                        }
+                    }
+                    historyHTML += '</div>';
+                });
+                document.getElementById("history").innerHTML = historyHTML;
+            } else {
+                document.getElementById("history").innerHTML = '<h3>Your Search History</h3><div class="empty-message"><p>No search history yet! <a href="/recommend">Start searching</a> to see your history here.</p></div>';
+            }
+        })
+        .catch(err => {
+            console.error("Error loading history:", err);
+            document.getElementById("history").innerHTML = '<div class="empty-message"><p>Error loading history: ' + escapeHtml(err.message) + '. Please try again.</p></div>';
+        });
+    }
+
+    // Load favorites from API
+    function loadFavorites() {
+        const token = localStorage.getItem("auth_token");
+        if (!token) {
+            document.getElementById("favorites").innerHTML = '<div class="empty-message"><p>Please <a href="/login">login</a> to view your favorite courses.</p></div>';
+            return;
+        }
+
+        fetch("/api/favorites", {
+            headers: { "Authorization": "Bearer " + token }
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log("Favorites data received:", data);
+            if (data.success && data.favorites && data.favorites.length > 0) {
+                let favHTML = '<h3>Your Favorite Courses</h3>';
+                favHTML += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">';
+                data.favorites.forEach(fav => {
+                    favHTML += `
+                        <div class="favorite-item">
+                            <h5>⭐ ${escapeHtml(fav.title)}</h5>
+                            <p><strong>Added:</strong> ${fav.timestamp}</p>
+                    `;
+                    if (fav.data) {
+                        const dataStr = typeof fav.data === 'string' ? fav.data : JSON.stringify(fav.data);
+                        favHTML += `<hr style="margin: 10px 0;"><p><small>${escapeHtml(dataStr)}</small></p>`;
+                    }
+                    favHTML += '</div>';
+                });
+                favHTML += '</div>';
+                document.getElementById("favorites").innerHTML = favHTML;
+                // Update tab count
+                document.getElementById("favorites-tab").textContent = `Favorite Courses (${data.favorites.length})`;
+            } else {
+                document.getElementById("favorites").innerHTML = '<h3>Your Favorite Courses</h3><div class="empty-message"><p>No favorite courses yet! <a href="/recommend">Start searching</a> and click the star (⭐) to save courses.</p></div>';
+                document.getElementById("favorites-tab").textContent = 'Favorite Courses (0)';
+            }
+        })
+        .catch(err => {
+            console.error("Error loading favorites:", err);
+            document.getElementById("favorites").innerHTML = '<div class="empty-message"><p>Error loading favorites: ' + escapeHtml(err.message) + '. Please try again.</p></div>';
+        });
+    }
+
+    // Escape HTML special characters
+    function escapeHtml(text) {
+        if (!text) return 'N/A';  // Show N/A for null/undefined/empty values
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.toString().replace(/[&<>"']/g, m => map[m]);
+    }
+
     window.addEventListener('DOMContentLoaded', function() {
         const token = getTokenFromURL();
         if (token && token !== 'current') {
             localStorage.setItem("auth_token", token);
-            // Clean URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
+        
+        // Load history and favorites
+        loadHistory();
+        loadFavorites();
     });
 </script>
 

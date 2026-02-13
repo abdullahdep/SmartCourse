@@ -10,6 +10,12 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 import os
 from werkzeug.utils import secure_filename
+import numpy as np
+import random
+
+# Set random seeds for reproducibility
+np.random.seed(42)
+random.seed(42)
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this'  # Change this to a secure key
@@ -88,24 +94,12 @@ def login_required(f):
         return f(user_id, *args, **kwargs)
     return decorated_function
 
-# Helper function to check authentication for page routes
-def check_auth_for_pages():
-    """Check if user is authenticated for page routes. Redirect to login if not."""
-    token = request.args.get('token')
-    if not token:
-        return redirect('/login')
-    
-    user_id = verify_token(token)
-    if not user_id:
-        return redirect('/login')
-    
-    return user_id
-
 # ---------------------- AUTH ROUTES ----------------------
 
 @app.route("/login")
 def login_page():
     return render_template("login.html")
+
 
 @app.route("/register")
 def register_page():
@@ -253,62 +247,14 @@ def home():
 
 @app.route("/recommend")
 def recommend_page():
-    auth_result = check_auth_for_pages()
-    if isinstance(auth_result, int):
-        # User is authenticated, auth_result is user_id
-        return render_template("recommend.html")
-    else:
-        # Not authenticated, auth_result is a redirect response
-        return auth_result
+    # Client-side JavaScript will check localStorage for token
+    return render_template("recommend.html")
 
 @app.route("/dashboard")
 def dashboard_page():
-    auth_result = check_auth_for_pages()
-    if isinstance(auth_result, int):
-        # User is authenticated
-        user_id = auth_result
-        
-        # Get history
-        raw_history = get_history(user_id)  # Get history only for this user
-        history = []
-        for row in raw_history:
-            # row = (query, model, results_json, timestamp)
-            query = row[0]
-            model = row[1]
-            results_str = row[2]
-            timestamp = row[3]
-            
-            # Parse results
-            try:
-                results = json.loads(results_str)
-            except:
-                results = results_str
-            
-            # For old format (single model), convert to new format
-            if model in ['tfidf', 'neural']:
-                # Old format - results is a list
-                if isinstance(results, list):
-                    if model == 'tfidf':
-                        results = {"tfidf": results, "neural": []}
-                    else:
-                        results = {"tfidf": [], "neural": results}
-                model = "both"  # Mark as both for consistency
-            
-            # Add to history as dict (compatible with template)
-            history.append({
-                "query": query,
-                "model": model,
-                "results": results,
-                "timestamp": timestamp
-            })
-        
-        # Get favorites
-        favorites = get_favorites(user_id)
-        
-        return render_template("dashboard.html", history=history, favorites=favorites, enumerate=enumerate)
-    else:
-        # Not authenticated, auth_result is a redirect response
-        return auth_result
+    # Client-side JavaScript will check localStorage for token
+    # History and favorites will be loaded via API endpoints with proper token validation
+    return render_template("dashboard.html", history=[], favorites=[], enumerate=enumerate)
 
 
 @app.route("/about")

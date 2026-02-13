@@ -1,9 +1,20 @@
 import sqlite3
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
+import numpy as np
 
 # Configure SQLite for better concurrent access on Windows
 sqlite3.connect("smartcourse.db").execute("PRAGMA journal_mode=WAL").close()
+
+def convert_nan_to_none(obj):
+    """Recursively convert NaN values to None for JSON serialization"""
+    if isinstance(obj, dict):
+        return {k: convert_nan_to_none(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_nan_to_none(item) for item in obj]
+    elif isinstance(obj, float) and np.isnan(obj):
+        return None
+    return obj
 
 def init_db():
     conn = sqlite3.connect("smartcourse.db", timeout=10)
@@ -49,6 +60,20 @@ def init_db():
             c.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
                      ("test", "test@example.com", hashed_pwd))
             conn.commit()
+        
+        # Clean up corrupted NaN values in history
+        c.execute("SELECT id, results FROM history WHERE results LIKE '%NaN%' OR results LIKE '%nan%'")
+        corrupted_entries = c.fetchall()
+        for entry_id, results_str in corrupted_entries:
+            try:
+                # Replace NaN with null and re-save
+                cleaned = results_str.replace('NaN', 'null').replace('nan', 'null')
+                c.execute("UPDATE history SET results = ? WHERE id = ?", (cleaned, entry_id))
+            except Exception as e:
+                print(f"Warning: Could not clean history entry {entry_id}: {str(e)}")
+        if corrupted_entries:
+            conn.commit()
+            print(f"Cleaned {len(corrupted_entries)} corrupted history entries")
             
     finally:
         conn.close()
@@ -101,8 +126,10 @@ def save_history(user_id, query, model, results):
     conn = sqlite3.connect("smartcourse.db", timeout=10)
     try:
         c = conn.cursor()
+        # Clean NaN values before saving
+        cleaned_results = convert_nan_to_none(results)
         c.execute("INSERT INTO history (user_id, query, model, results) VALUES (?, ?, ?, ?)",
-                  (user_id, query, model, json.dumps(results)))
+                  (user_id, query, model, json.dumps(cleaned_results)))
         conn.commit()
     finally:
         conn.close()
@@ -112,11 +139,31 @@ def get_history(user_id=None):
     try:
         c = conn.cursor()
         if user_id:
-            c.execute("SELECT query, model, results, timestamp FROM history WHERE user_id = ? ORDER BY id DESC", (user_id,))
+            c.execute("SELECT id, query, model, results, timestamp FROM history WHERE user_id = ? ORDER BY id DESC", (user_id,))
         else:
-            c.execute("SELECT query, model, results, timestamp FROM history ORDER BY id DESC")
+            c.execute("SELECT id, query, model, results, timestamp FROM history ORDER BY id DESC")
         data = c.fetchall()
-        return data
+        result = []
+        for row in data:
+            try:
+                # Try to parse results as JSON
+                results_data = row[3]
+                if isinstance(results_data, str):
+                    # Try to parse, but handle NaN by replacing with null
+                    results_data = results_data.replace('NaN', 'null').replace('nan', 'null')
+                    results_data = json.loads(results_data)
+                
+                result.append({
+                    "query": row[1],
+                    "model": row[2],
+                    "results": results_data,
+                    "timestamp": row[4]
+                })
+            except (json.JSONDecodeError, ValueError) as e:
+                # Skip corrupted entries
+                print(f"Warning: Skipping corrupted history entry {row[0]}: {str(e)}")
+                continue
+        return result
     finally:
         conn.close()
 
