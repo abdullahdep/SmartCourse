@@ -41,8 +41,8 @@ for q in sample_queries:
     tfidf_results = evaluate_tfidf(q)
     neural_results = evaluate_neural(q)
 
-    print("TF-IDF Top Result:", df.iloc[tfidf_results[0]]["offered courses"])
-    print("Neural Top Result:", df.iloc[neural_results[0]]["offered courses"])
+    print("TF-IDF Top Result:", df.iloc[tfidf_results[0]]["Course title"])
+    print("Neural Top Result:", df.iloc[neural_results[0]]["Course title"])
 
     overlap = len(set(tfidf_results) & set(neural_results))
     print("Overlap in top 10:", overlap)

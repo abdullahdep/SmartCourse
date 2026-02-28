@@ -51,7 +51,7 @@ def neural_recommend(query, df):
             "admission_dates": convert_nan(df.iloc[i]["Admission dates"]),
             "marks_required": convert_nan(df.iloc[i]["Marks required"]),
             "labs_available": convert_nan(df.iloc[i]["Labs Avalible"]),
-            "courseoffered": convert_nan(df.iloc[i]["offered courses"]),
+            "course_title": convert_nan(df.iloc[i]["Course title"]),
             "score": round(float(score) * 100, 2)
         })
 

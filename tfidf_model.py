@@ -34,7 +34,7 @@ def tfidf_recommend(query, df, top_k=10):
             "admission_dates": convert_nan(df.iloc[i]["Admission dates"]),
             "marks_required": convert_nan(df.iloc[i]["Marks required"]),
             "labs_available": convert_nan(df.iloc[i]["Labs Avalible"]),
-            "courseoffered": convert_nan(df.iloc[i]["offered courses"]),
+            "course_title": convert_nan(df.iloc[i]["Course title"]),
             "score": round(float(similarity[i] * 100), 2)
         })
     return results
