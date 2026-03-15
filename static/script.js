@@ -195,17 +195,17 @@ function createCardHTML(r, index, model) {
     const scoreBackground = model.includes('tfidf') || model === 'tfidf' ? '#e7f3ff' : '#e8f5e9';
     
     return `
-        <div class="card mb-3 p-3 border" data-course-title="${r.courseoffered}" style="border-left: 4px solid ${borderColor};">
+        <div class="card mb-3 p-3 border" data-course-title="${r.course_title}" style="border-left: 4px solid ${borderColor};">
             <div style="display: flex; justify-content: space-between; align-items: start;">
                 <div style="flex: 1;">
-                    <p><b>${r.courseoffered}</b></p>
+                    <p><b>${r.course_title}</b></p>
                     <progress id="file-progress-${index}" value="${r.score.toFixed(2)}" max="100"></progress> 
                     <span style="background: ${scoreBackground}; padding: 2px 6px; border-radius: 3px;">${r.score.toFixed(2)}%</span>
                     <p style="margin-top: 10px;"><b>Department:</b> ${r.department || 'N/A'}</p>
                     <p><b>University:</b> ${r.title || 'N/A'}</p>
                     <p><b>Description:</b> ${r.description}</p>
                 </div>
-                <button class="favorite-btn" data-course-index="${index}" data-course-title="${r.courseoffered}" onclick="toggleFavorite('${r.courseoffered}', ${index}, event)" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 5px; margin-left: 10px;" title="Add to favorites">
+                <button class="favorite-btn" data-course-index="${index}" data-course-title="${r.course_title}" onclick="toggleFavorite('${r.course_title}', ${index}, event)" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 5px; margin-left: 10px;" title="Add to favorites">
                     ⭐
                 </button>
             </div>
@@ -274,10 +274,30 @@ function toggleFavorite(courseTitle, courseIndex, event) {
     } else {
         // Add to favorites - get course data from the displayed card
         const cardElement = event.target.closest('.card');
+        const paragraphs = cardElement.querySelectorAll('p');
+        
+        // Extract course data from card
         const courseData = {
-            title: courseTitle,
-            // You can add more course data here if needed from the card
+            title: courseTitle
         };
+        
+        // Extract department, university, and description from the card
+        paragraphs.forEach(p => {
+            const text = p.textContent;
+            if (text.includes('Department:')) {
+                courseData.department = text.replace('Department:', '').trim();
+            } else if (text.includes('University:')) {
+                courseData.university = text.replace('University:', '').trim();
+            } else if (text.includes('Description:')) {
+                courseData.description = text.replace('Description:', '').trim();
+            }
+        });
+        
+        // Get score if available
+        const progress = cardElement.querySelector('progress');
+        if (progress) {
+            courseData.score = progress.value;
+        }
 
         fetch("/api/favorite", {
             method: "POST",

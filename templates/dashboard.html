@@ -199,8 +199,19 @@
                             <p><strong>Added:</strong> ${fav.timestamp}</p>
                     `;
                     if (fav.data) {
-                        const dataStr = typeof fav.data === 'string' ? fav.data : JSON.stringify(fav.data);
-                        favHTML += `<hr style="margin: 10px 0;"><p><small>${escapeHtml(dataStr)}</small></p>`;
+                        const courseData = typeof fav.data === 'string' ? JSON.parse(fav.data) : fav.data;
+                        if (courseData.university) {
+                            favHTML += `<p><strong>University:</strong> ${escapeHtml(courseData.university)}</p>`;
+                        }
+                        if (courseData.department) {
+                            favHTML += `<p><strong>Department:</strong> ${escapeHtml(courseData.department)}</p>`;
+                        }
+                        if (courseData.score) {
+                            favHTML += `<p><strong>Score:</strong> ${parseFloat(courseData.score).toFixed(2)}%</p>`;
+                        }
+                        if (courseData.description) {
+                            favHTML += `<p><strong>Description:</strong> ${escapeHtml(courseData.description.substring(0, 150))}${courseData.description.length > 150 ? '...' : ''}</p>`;
+                        }
                     }
                     favHTML += '</div>';
                 });

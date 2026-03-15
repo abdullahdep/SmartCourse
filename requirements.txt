@@ -9,3 +9,4 @@ sentence-transformers
 joblib
 PyJWT
 Werkzeug
+tf-keras
